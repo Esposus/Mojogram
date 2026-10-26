@@ -1,9 +1,11 @@
 from bot import Bot, Update
 from std.time import time
+from std.os import getenv
+
 
 def main() raises:
     print("Mojo bot startis 🔥")
-    var bot = Bot()
+    var bot = Bot(getenv("TOKEN"))
     var offset = 0
     while True:
         var updates = bot.get_updates(offset)

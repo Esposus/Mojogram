@@ -1,4 +1,4 @@
-from std.os import getenv
+# from std.os import getenv
 from std.time import time
 
 from emberjson import from_json
@@ -8,16 +8,33 @@ from floki.timeout import Timeout
 
 
 struct Bot:
-    """Mojogram"""
+    """Mojogram bot object."""
+
     var client: Session
     var token: String
 
-    def __init__(out self) raises:
-        self.client = Session(timeout=Timeout(connect=5.0, total=40.0))
-        self.token = getenv("TOKEN")
+    def __init__(out self, var token: String) raises:
+        self.client = Session(timeout=Timeout(connect=5.0, total=90.0))
+        self.token = token
+    
+    def _api_url(self) -> String:
+        """Base URL prefix for Telegram Bot API."""
+        return "https://api.telegram.org/bot" + self.token + "/"
 
-    def get_updates(mut self, offset: Int = 0, timeout: Int = 30) raises -> List[Update]:
-        var url = String(t"https://api.telegram.org/bot{self.token}/getUpdates?offset={offset}&timeout={timeout}")
+    def get_updates(mut self, offset: Int = 0, timeout_seconds: Int = 60) raises -> List[Update]:
+        """Method for telegram updates.
+        Args:
+            offset (Int): Identifier of the first update to be returned. Defaults to 0.
+            timeout_seconds (Int): Timeout in seconds for long polling. Defaults to 60.
+        Returns:
+            List of Update objects
+        Raises:
+            Error: If error occurred while requesting telegram API.
+
+        `https://core.telegram.org/bots/api#getupdates`
+        """
+
+        var url = self._api_url() + String(t"getUpdates?offset={offset}&timeout={timeout_seconds}")
         var response: Response = self.client.get(url)
         response.raise_for_status()
 
@@ -31,7 +48,7 @@ struct Bot:
         return updates^
 
     def send_message(mut self, chat_id: Int, text: String) raises:
-        var url = String(t"https://api.telegram.org/bot{self.token}/sendMessage")
+        var url = self._api_url + "sendMessage"
         var response = self.client.post(
             url,
             data={
@@ -47,7 +64,7 @@ struct Bot:
         from_chat_id: Int,
         message_id: Int,
     ) raises -> Int:
-        var url = String(t"https://api.telegram.org/bot{self.token}/copyMessage")
+        var url = self._api_url() + "copyMessage"
 
         for attempt in range(3):
             var response = self.client.post(
@@ -58,7 +75,7 @@ struct Bot:
                     "message_id": message_id,
                 },
             )
-            var data = response.as[CopyMessageResponse]()
+            var data = response.as[TelegramResponse[MessageId]]()
 
             if data.error_code and data.error_code.value() == 429 and data.parameters:
                 var seconds = data.parameters.value().retry_after
@@ -86,7 +103,7 @@ struct Bot:
         from_chat_id: Int,
         message_id: Int,
     ) raises -> Message:
-        var url = String(t"https://api.telegram.org/bot{self.token}/forwardMessage")
+        var url = self._api_url() + "forwardMessage"
 
         for attempt in range(3):
             var response = self.client.post(
@@ -97,7 +114,7 @@ struct Bot:
                     "message_id": message_id,
                 },
             )
-            var data = response.as[ForwardMessageResponse]()
+            var data = response.as[TelegramResponse[Message]]()
 
             if data.error_code and data.error_code.value() == 429 and data.parameters:
                 var seconds = data.parameters.value().retry_after
@@ -154,7 +171,6 @@ struct Message(Defaultable, Copyable, Writable):
         writer.write(t"Message(id={self.message_id}, chat_id={self.chat.id}, text={self.text})")
 
 
-@fieldwise_init
 struct From(Copyable):
     var id: Int
 
@@ -166,7 +182,7 @@ struct Chat(Copyable):
         self.id = 0
 
 
-struct MessageId(Movable):
+struct MessageId(Defaultable, Movable):
     var message_id: Int
 
     def __init__(out self):
@@ -180,27 +196,14 @@ struct ResponseParameters(Movable):
         self.retry_after = 0
 
 
-struct CopyMessageResponse(Defaultable, Movable):
+struct TelegramResponse[T: Defaultable & Deinitable & Movable](Defaultable, Movable):
     var ok: Bool
-    var result: Optional[MessageId]
+    var result: Optional[Self.T]
     var error_code: Optional[Int]
     var parameters: Optional[ResponseParameters]
 
     def __init__(out self):
         self.ok = False
-        self.result = Optional[MessageId]()
-        self.error_code = Optional[Int]()
-        self.parameters = Optional[ResponseParameters]()
-
-
-struct ForwardMessageResponse(Defaultable, Movable):
-    var ok: Bool
-    var result: Optional[Message]
-    var error_code: Optional[Int]
-    var parameters: Optional[ResponseParameters]
-
-    def __init__(out self):
-        self.ok = False
-        self.result = Optional[Message]()
+        self.result = Optional[Self.T]()
         self.error_code = Optional[Int]()
         self.parameters = Optional[ResponseParameters]()
