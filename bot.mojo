@@ -1,4 +1,3 @@
-# from std.os import getenv
 from std.time import time
 
 from emberjson import from_json

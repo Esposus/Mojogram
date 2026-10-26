@@ -1,6 +1,7 @@
-from bot import Bot, Update
-from std.time import time
 from std.os import getenv
+from std.time import time
+
+from bot import Bot, Update
 
 
 def main() raises:
