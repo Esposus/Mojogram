@@ -10,17 +10,24 @@ def main() raises:
     var offset = 0
     while True:
         var updates = bot.get_updates(offset)
-        for update in updates:
-            if update.message:
-                var message = update.message.value().copy()
-                if message.`from` and message.`from`.value().id == 33767888:
-                    try:
-                        _ = bot.copy_message(message.chat.id, message.chat.id, message.message_id)
-                    except e:
-                        print("Failed to copy message:", e)
-                else:
-                    try:
-                        _ = bot.forward_message(message.chat.id, message.chat.id, message.message_id)
-                    except e:
-                        print("Failed to forward message:", e)
-            offset = update.update_id + 1
+        offset = process_updates(bot, updates^, offset)
+
+
+def process_updates(mut bot: Bot, var updates: List[Update], offset: Int) raises -> Int:
+    var offset_inner = offset
+    for update in updates:
+        try:
+            offset_inner = handle_update(bot, update)
+        except e:
+            print("Failed to process a message:", e)
+    return offset_inner
+
+
+def handle_update(mut bot: Bot, update: Update) raises -> Int:
+    if update.message:
+        var message = update.message.value().copy()
+        if message.`from` and message.`from`.value().id == 33767888:
+            _ = bot.copy_message(message.chat.id, message.chat.id, message.message_id)
+        else:
+            _ = bot.forward_message(message.chat.id, message.chat.id, message.message_id)
+    return update.update_id + 1

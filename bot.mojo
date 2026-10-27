@@ -1,36 +1,36 @@
 from std.time import time
 
-from emberjson import from_json
 from floki.response import Response
 from floki.session import Session
 from floki.timeout import Timeout
 
 
 struct Bot:
-    """Mojogram bot object."""
+    """Provides access to the Telegram Bot API."""
 
     var client: Session
     var token: String
 
     def __init__(out self, var token: String) raises:
         self.client = Session(timeout=Timeout(connect=5.0, total=90.0))
-        self.token = token
+        self.token = token^
     
     def _api_url(self) -> String:
         """Base URL prefix for Telegram Bot API."""
         return "https://api.telegram.org/bot" + self.token + "/"
 
     def get_updates(mut self, offset: Int = 0, timeout_seconds: Int = 60) raises -> List[Update]:
-        """Method for telegram updates.
-        Args:
-            offset (Int): Identifier of the first update to be returned. Defaults to 0.
-            timeout_seconds (Int): Timeout in seconds for long polling. Defaults to 60.
-        Returns:
-            List of Update objects
-        Raises:
-            Error: If error occurred while requesting telegram API.
+        """Fetches updates using long polling.
 
-        `https://core.telegram.org/bots/api#getupdates`
+        Args:
+            offset: The first update identifier to retrieve (defaults to 0).
+            timeout_seconds: The long polling timeout in seconds (defaults to 60).
+
+        Returns:
+            A list of available updates.
+
+        Raises:
+            Error: If the request fails or Telegram reports an API error.
         """
 
         var url = self._api_url() + String(t"getUpdates?offset={offset}&timeout={timeout_seconds}")
@@ -47,7 +47,7 @@ struct Bot:
         return updates^
 
     def send_message(mut self, chat_id: Int, text: String) raises:
-        var url = self._api_url + "sendMessage"
+        var url = self._api_url() + "sendMessage"
         var response = self.client.post(
             url,
             data={
