@@ -46,7 +46,7 @@ struct Router(Movable):
         var text = message.text.value().copy()
 
         for route in self.commands:
-            if text.starts_with("/" + route.command):
+            if text.startswith("/" + route.command):
                 route.handler(bot, update)
                 return True
 
