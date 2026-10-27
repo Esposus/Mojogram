@@ -3,3 +3,4 @@
 !.pixi/config.toml
 /.agents/skills/
 .zed
+skills-lock.json
