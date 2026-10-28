@@ -1,3 +1,5 @@
+"""Routes incoming updates to the appropriate command handlers."""
+
 from .client import Bot
 from .types import Update
 
