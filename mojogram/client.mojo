@@ -1,7 +1,6 @@
 from std.logger import Logger
 from std.time import time
 
-from emberjson import from_json
 from floki.response import Response
 from floki.session import Session
 from floki.timeout import Timeout
@@ -26,7 +25,7 @@ struct Bot:
         """Base URL prefix for Telegram Bot API."""
         return "https://api.telegram.org/bot" + self.token + "/"
 
-    def start(self) raises:
+    def start(mut self) raises:
         """Starts the bot by continuously fetching and processing updates."""
         var offset = 0
         while True:

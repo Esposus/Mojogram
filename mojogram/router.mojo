@@ -1,3 +1,5 @@
+"""Routes incoming updates to the appropriate command handlers."""
+
 from .client import Bot
 from .types import Update
 
@@ -16,7 +18,7 @@ struct CommandRoute(Copyable):
         self.handler = handler
 
 
-struct Router(Movable):
+struct Router(Copyable, Movable):
     """Routes incoming updates to the appropriate command handlers."""
 
     var commands: List[CommandRoute]
