@@ -52,7 +52,7 @@ struct Router(Copyable, Movable):
 
         if not update.message:
             return False
-        
+
         var message = update.message.value().copy()
 
         if not message.text:

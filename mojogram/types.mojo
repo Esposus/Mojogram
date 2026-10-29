@@ -7,13 +7,16 @@ struct UpdateResponse(Defaultable, Movable):
         self.result = List[Update]()
 
 
-struct Update(Copyable, Defaultable):
+struct Update(Copyable, Defaultable, Writable):
     var update_id: Int
     var message: Optional[Message]
 
     def __init__(out self):
         self.update_id = 0
         self.message = Optional[Message]()
+
+    def write_to(self, mut writer: Some[Writer]):
+        writer.write(t"Update(update_id={self.update_id}, message={self.message})")
 
 
 struct Message(Defaultable, Copyable, Writable):

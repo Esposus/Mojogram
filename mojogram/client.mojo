@@ -25,13 +25,6 @@ struct Bot:
         """Base URL prefix for Telegram Bot API."""
         return "https://api.telegram.org/bot" + self.token + "/"
 
-    def start(mut self) raises:
-        """Starts the bot by continuously fetching and processing updates."""
-        var offset = 0
-        while True:
-            var updates = self.get_updates(offset)
-            offset = self.process_updates(updates^, offset)
-
     def get_updates(mut self, offset: Int = 0, timeout_seconds: Int = 60) raises -> List[Update]:
         """Fetches updates using long polling.
 
@@ -58,25 +51,6 @@ struct Bot:
         var updates = List[Update]()
         swap(updates, data.result)
         return updates^
-
-    def process_updates(mut self, var updates: List[Update], offset: Int) raises -> Int:
-        var offset_inner = offset
-        for update in updates:
-            try:
-                offset_inner = self.handle_update(update)
-            except e:
-                logger.error(t"Failed to process update {update.update_id}: {e}")
-        return offset_inner
-
-
-    def handle_update(mut self, update: Update) raises -> Int:
-        if update.message:
-            var message = update.message.value().copy()
-            if message.`from` and message.`from`.value().id == 33767888:
-                _ = self.copy_message(message.chat.id, message.chat.id, message.message_id)
-            else:
-                _ = self.forward_message(message.chat.id, message.chat.id, message.message_id)
-        return update.update_id + 1
 
     def send_message(mut self, chat_id: Int, text: String) raises:
         var url = self._api_url() + "sendMessage"
