@@ -25,7 +25,7 @@ struct MessageRoute(Copyable):
         self.handler = handler
 
 
-struct Router(Copyable, Movable):
+struct Router(Copyable):
     """Routes incoming updates to the appropriate command handlers."""
 
     var commands: List[CommandRoute]
@@ -43,7 +43,7 @@ struct Router(Copyable, Movable):
     def on_message(mut self, handler: Handler):
         """Registers a message handler."""
         self.messages.append(MessageRoute(handler))
-    
+
     def dispatch(self, mut bot: Bot, update: Update) raises -> Bool:
         """Dispatches the update to the appropriate command handler if a matching command is found.
 
