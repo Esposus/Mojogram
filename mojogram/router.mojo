@@ -39,7 +39,7 @@ struct Router(Copyable):
     def on_command(mut self, var command: String, handler: Handler):
         """Registers a command handler for the specified command."""
         self.commands.append(CommandRoute(command^, handler))
-    
+
     def on_message(mut self, handler: Handler):
         """Registers a message handler."""
         self.messages.append(MessageRoute(handler))
@@ -49,24 +49,40 @@ struct Router(Copyable):
 
             Returns: True if a command was handled, otherwise False.
         """
+        if case .Some(message) = update.message:
+            if case .Some(text) = message.text:
 
-        if not update.message:
-            return False
+                for route in self.commands:
+                    if text.startswith(route.command):
+                        route.handler(bot, update)
+                        return True
 
-        var message = update.message.value().copy()
-
-        if not message.text:
-            return False
-        
-        var text = message.text.value().copy()
-
-        for route in self.commands:
-            if text.startswith("/" + route.command):
-                route.handler(bot, update)
-                return True
-
-        for route in self.messages:
-            route.handler(bot, update)
-            return True
+                for route in self.messages:
+                    route.handler(bot, update)
+                    return True
 
         return False
+
+
+    # def dispatch_bak(self, mut bot: Bot, update: Update) raises -> Bool:
+
+    #     if not update.message:
+    #         return False
+
+    #     ref message = update.message.value()
+
+    #     if not message.text:
+    #         return False
+
+    #     ref text = message.text.value()
+
+    #     for route in self.commands:
+    #         if text.startswith(route.command):
+    #             route.handler(bot, update)
+    #             return True
+
+    #     for route in self.messages:
+    #         route.handler(bot, update)
+    #         return True
+
+    #     return False

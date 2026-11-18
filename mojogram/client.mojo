@@ -20,7 +20,7 @@ struct Bot:
     def __init__(out self, var token: String) raises:
         self.client = Session(timeout=Timeout(connect=5.0, total=90.0))
         self.token = token^
-    
+
     def _api_url(self) -> String:
         """Base URL prefix for Telegram Bot API."""
         return "https://api.telegram.org/bot" + self.token + "/"
@@ -58,6 +58,18 @@ struct Bot:
             url,
             data={
                 "chat_id": chat_id,
+                "text": text,
+            },
+        )
+        response.raise_for_status()
+
+    def reply_text(mut self, chat_id: Int, reply_message_id: Int, text: String) raises:
+        var url = self._api_url() + "sendMessage"
+        var response = self.client.post(
+            url,
+            data={
+                "chat_id": chat_id,
+                "reply_parameters": {"message_id": reply_message_id},
                 "text": text,
             },
         )

@@ -2,6 +2,6 @@
 .pixi/*
 !.pixi/config.toml
 /.agents/skills/
-.zed
+/.claude/
 skills-lock.json
 notebook

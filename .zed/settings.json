@@ -1,0 +1,12 @@
+{
+  "lsp": {
+    "mojo-lsp-server": {
+      "binary": {
+        "path": "/home/user/Projects/Mojogram/.pixi/envs/default/bin/mojo-lsp-server",
+        "env": {
+          "MODULAR_HOME": "/home/user/Projects/Mojogram/.pixi/envs/default/share/max"
+        }
+      }
+    }
+  }
+}
